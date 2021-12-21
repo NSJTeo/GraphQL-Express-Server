@@ -82,9 +82,7 @@ const RootQueryType: GraphQLObjectType = new GraphQLObjectType({
         const books: BookType[] = JSON.parse(
           fs.readFileSync("./data/books.json", "utf-8")
         );
-        return books.find((book) => {
-          return book.id === args.id;
-        });
+        return books.find((book) => book.id === args.id);
       },
     },
     authors: {
@@ -93,6 +91,19 @@ const RootQueryType: GraphQLObjectType = new GraphQLObjectType({
       resolve: () => {
         const authors: string = fs.readFileSync("./data/authors.json", "utf-8");
         return JSON.parse(authors);
+      },
+    },
+    author: {
+      type: AuthorType,
+      description: "A single author",
+      args: {
+        id: { type: GraphQLInt },
+      },
+      resolve: (_, args) => {
+        const authors: AuthorType[] = JSON.parse(
+          fs.readFileSync("./data/authors.json", "utf-8")
+        );
+        return authors.find((author) => author.id === args.id);
       },
     },
   }),
