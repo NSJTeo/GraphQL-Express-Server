@@ -51,6 +51,19 @@ const RootQueryType = new graphql_1.GraphQLObjectType({
                 return JSON.parse(books);
             },
         },
+        book: {
+            type: BookType,
+            description: "A single book",
+            args: {
+                id: { type: graphql_1.GraphQLInt },
+            },
+            resolve: (_, args) => {
+                const books = JSON.parse(fs_1.default.readFileSync("./data/books.json", "utf-8"));
+                return books.find((book) => {
+                    return book.id === args.id;
+                });
+            },
+        },
         authors: {
             type: new graphql_1.GraphQLList(AuthorType),
             description: "List of all authors",

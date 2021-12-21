@@ -72,6 +72,21 @@ const RootQueryType: GraphQLObjectType = new GraphQLObjectType({
         return JSON.parse(books);
       },
     },
+    book: {
+      type: BookType,
+      description: "A single book",
+      args: {
+        id: { type: GraphQLInt },
+      },
+      resolve: (_, args) => {
+        const books: BookType[] = JSON.parse(
+          fs.readFileSync("./data/books.json", "utf-8")
+        );
+        return books.find((book) => {
+          return book.id === args.id;
+        });
+      },
+    },
     authors: {
       type: new GraphQLList(AuthorType),
       description: "List of all authors",
