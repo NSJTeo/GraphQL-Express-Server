@@ -8,17 +8,21 @@ const fs_1 = __importDefault(require("fs"));
 const express_graphql_1 = require("express-graphql");
 const graphql_1 = require("graphql");
 const app = (0, express_1.default)();
-const books = [
-    { id: 1, name: "Dune", authorId: 1 },
-    { id: 2, name: "Dune Messiah", authorId: 1 },
-    { id: 3, name: "Children of Dune", authorId: 1 },
-    { id: 4, name: "God Emperor of Dune", authorId: 1 },
-    { id: 5, name: "Heretics of Dune", authorId: 1 },
-    { id: 6, name: "Chapterhouse: Dune", authorId: 1 },
-    { id: 7, name: "The Three-Body Problem", authorId: 2 },
-    { id: 8, name: "The Dark Forest", authorId: 2 },
-    { id: 8, name: "Death's End", authorId: 2 },
-];
+const AuthorType = new graphql_1.GraphQLObjectType({
+    name: "Author",
+    description: "This represents the author of a book",
+    fields: () => ({
+        id: { type: (0, graphql_1.GraphQLNonNull)(graphql_1.GraphQLInt) },
+        name: { type: (0, graphql_1.GraphQLNonNull)(graphql_1.GraphQLString) },
+        books: {
+            type: (0, graphql_1.GraphQLList)(BookType),
+            resolve: (author) => {
+                const books = JSON.parse(fs_1.default.readFileSync("./data/books.json", "utf-8"));
+                return books.filter((book) => book.authorId === author.id);
+            },
+        },
+    }),
+});
 const BookType = new graphql_1.GraphQLObjectType({
     name: "Book",
     description: "This represents a book written by an author",
@@ -26,6 +30,13 @@ const BookType = new graphql_1.GraphQLObjectType({
         id: { type: (0, graphql_1.GraphQLNonNull)(graphql_1.GraphQLInt) },
         name: { type: (0, graphql_1.GraphQLNonNull)(graphql_1.GraphQLString) },
         authorId: { type: (0, graphql_1.GraphQLNonNull)(graphql_1.GraphQLInt) },
+        author: {
+            type: AuthorType,
+            resolve: (book) => {
+                const authors = JSON.parse(fs_1.default.readFileSync("./data/authors.json", "utf-8"));
+                return authors.find((author) => author.id === book.authorId);
+            },
+        },
     }),
 });
 const RootQueryType = new graphql_1.GraphQLObjectType({
@@ -34,10 +45,18 @@ const RootQueryType = new graphql_1.GraphQLObjectType({
     fields: () => ({
         books: {
             type: new graphql_1.GraphQLList(BookType),
-            description: "List of All Books",
+            description: "List of all books",
             resolve: () => {
                 const books = fs_1.default.readFileSync("./data/books.json", "utf-8");
                 return JSON.parse(books);
+            },
+        },
+        authors: {
+            type: new graphql_1.GraphQLList(AuthorType),
+            description: "List of all authors",
+            resolve: () => {
+                const authors = fs_1.default.readFileSync("./data/authors.json", "utf-8");
+                return JSON.parse(authors);
             },
         },
     }),

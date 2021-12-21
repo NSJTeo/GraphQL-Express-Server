@@ -12,44 +12,78 @@ import {
 
 const app = express();
 
-const books = [
-  { id: 1, name: "Dune", authorId: 1 },
-  { id: 2, name: "Dune Messiah", authorId: 1 },
-  { id: 3, name: "Children of Dune", authorId: 1 },
-  { id: 4, name: "God Emperor of Dune", authorId: 1 },
-  { id: 5, name: "Heretics of Dune", authorId: 1 },
-  { id: 6, name: "Chapterhouse: Dune", authorId: 1 },
-  { id: 7, name: "The Three-Body Problem", authorId: 2 },
-  { id: 8, name: "The Dark Forest", authorId: 2 },
-  { id: 8, name: "Death's End", authorId: 2 },
-];
+interface AuthorType {
+  id: Number;
+  name: String;
+}
 
-const BookType = new GraphQLObjectType({
+interface BookType {
+  id: Number;
+  name: String;
+  authorId: Number;
+}
+
+const AuthorType: GraphQLObjectType = new GraphQLObjectType({
+  name: "Author",
+  description: "This represents the author of a book",
+  fields: () => ({
+    id: { type: GraphQLNonNull(GraphQLInt) },
+    name: { type: GraphQLNonNull(GraphQLString) },
+    books: {
+      type: GraphQLList(BookType),
+      resolve: (author: AuthorType) => {
+        const books: BookType[] = JSON.parse(
+          fs.readFileSync("./data/books.json", "utf-8")
+        );
+        return books.filter((book) => book.authorId === author.id);
+      },
+    },
+  }),
+});
+
+const BookType: GraphQLObjectType = new GraphQLObjectType({
   name: "Book",
   description: "This represents a book written by an author",
   fields: () => ({
     id: { type: GraphQLNonNull(GraphQLInt) },
     name: { type: GraphQLNonNull(GraphQLString) },
     authorId: { type: GraphQLNonNull(GraphQLInt) },
-  }),
-});
-
-const RootQueryType = new GraphQLObjectType({
-  name: "Query",
-  description: "Root Query",
-  fields: () => ({
-    books: {
-      type: new GraphQLList(BookType),
-      description: "List of All Books",
-      resolve: () => {
-        const books = fs.readFileSync("./data/books.json", "utf-8");
-        return JSON.parse(books);
+    author: {
+      type: AuthorType,
+      resolve: (book: BookType) => {
+        const authors: AuthorType[] = JSON.parse(
+          fs.readFileSync("./data/authors.json", "utf-8")
+        );
+        return authors.find((author) => author.id === book.authorId);
       },
     },
   }),
 });
 
-const schema = new GraphQLSchema({
+const RootQueryType: GraphQLObjectType = new GraphQLObjectType({
+  name: "Query",
+  description: "Root Query",
+  fields: () => ({
+    books: {
+      type: new GraphQLList(BookType),
+      description: "List of all books",
+      resolve: () => {
+        const books: string = fs.readFileSync("./data/books.json", "utf-8");
+        return JSON.parse(books);
+      },
+    },
+    authors: {
+      type: new GraphQLList(AuthorType),
+      description: "List of all authors",
+      resolve: () => {
+        const authors: string = fs.readFileSync("./data/authors.json", "utf-8");
+        return JSON.parse(authors);
+      },
+    },
+  }),
+});
+
+const schema: GraphQLSchema = new GraphQLSchema({
   query: RootQueryType,
 });
 
