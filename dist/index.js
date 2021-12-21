@@ -83,8 +83,35 @@ const RootQueryType = new graphql_1.GraphQLObjectType({
         },
     }),
 });
+const RootMutationType = new graphql_1.GraphQLObjectType({
+    name: "Mutation",
+    description: "Root Mutation",
+    fields: () => ({
+        addBook: {
+            type: BookType,
+            description: "Add a single book",
+            args: {
+                name: { type: (0, graphql_1.GraphQLNonNull)(graphql_1.GraphQLString) },
+                authorId: { type: (0, graphql_1.GraphQLNonNull)(graphql_1.GraphQLInt) },
+            },
+            resolve: (_, args) => {
+                console.log("creating book");
+                const books = JSON.parse(fs_1.default.readFileSync("./data/books.json", "utf-8"));
+                const book = {
+                    id: books.length++,
+                    name: args.name,
+                    authorId: args.authorId,
+                };
+                books.push(book);
+                fs_1.default.writeFileSync("./data/books.json", JSON.stringify(books));
+                return book;
+            },
+        },
+    }),
+});
 const schema = new graphql_1.GraphQLSchema({
     query: RootQueryType,
+    mutation: RootMutationType,
 });
 app.use("/graphql", (0, express_graphql_1.graphqlHTTP)({
     schema,
