@@ -121,18 +121,38 @@ const RootMutationType: GraphQLObjectType = new GraphQLObjectType({
         authorId: { type: GraphQLNonNull(GraphQLInt) },
       },
       resolve: (_, args) => {
-        console.log("creating book");
         const books: BookType[] = JSON.parse(
           fs.readFileSync("./data/books.json", "utf-8")
         );
         const book: BookType = {
-          id: books.length++,
+          id: books.length + 1,
           name: args.name,
           authorId: args.authorId,
         };
         books.push(book);
         fs.writeFileSync("./data/books.json", JSON.stringify(books));
         return book;
+      },
+    },
+    addAuthor: {
+      type: BookType,
+      description: "Add a single author",
+      args: {
+        name: { type: GraphQLNonNull(GraphQLString) },
+      },
+      resolve: (_, args) => {
+        const authors: AuthorType[] = JSON.parse(
+          fs.readFileSync("./data/authors.json", "utf-8")
+        );
+        console.log(authors.length);
+        console.log(authors.length + 1);
+        const author: AuthorType = {
+          id: authors.length + 1,
+          name: args.name,
+        };
+        authors.push(author);
+        fs.writeFileSync("./data/authors.json", JSON.stringify(authors));
+        return author;
       },
     },
   }),

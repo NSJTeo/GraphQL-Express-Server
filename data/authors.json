@@ -1,4 +1,1 @@
-[
-  { "id": 1, "name": "Frank Herbert" },
-  { "id": 2, "name": "Liu Cixin" }
-]
+[{"id":1,"name":"Frank Herbert"},{"id":2,"name":"Liu Cixin"},{"id":3,"name":"Arthur C. Clarke"}]

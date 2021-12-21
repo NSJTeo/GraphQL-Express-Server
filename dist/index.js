@@ -95,16 +95,34 @@ const RootMutationType = new graphql_1.GraphQLObjectType({
                 authorId: { type: (0, graphql_1.GraphQLNonNull)(graphql_1.GraphQLInt) },
             },
             resolve: (_, args) => {
-                console.log("creating book");
                 const books = JSON.parse(fs_1.default.readFileSync("./data/books.json", "utf-8"));
                 const book = {
-                    id: books.length++,
+                    id: books.length + 1,
                     name: args.name,
                     authorId: args.authorId,
                 };
                 books.push(book);
                 fs_1.default.writeFileSync("./data/books.json", JSON.stringify(books));
                 return book;
+            },
+        },
+        addAuthor: {
+            type: BookType,
+            description: "Add a single author",
+            args: {
+                name: { type: (0, graphql_1.GraphQLNonNull)(graphql_1.GraphQLString) },
+            },
+            resolve: (_, args) => {
+                const authors = JSON.parse(fs_1.default.readFileSync("./data/authors.json", "utf-8"));
+                console.log(authors.length);
+                console.log(authors.length + 1);
+                const author = {
+                    id: authors.length + 1,
+                    name: args.name,
+                };
+                authors.push(author);
+                fs_1.default.writeFileSync("./data/authors.json", JSON.stringify(authors));
+                return author;
             },
         },
     }),
