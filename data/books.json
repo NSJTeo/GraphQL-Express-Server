@@ -1,0 +1,11 @@
+[
+  { "id": 1, "name": "Dune", "authorId": 1 },
+  { "id": 2, "name": "Dune Messiah", "authorId": 1 },
+  { "id": 3, "name": "Children of Dune", "authorId": 1 },
+  { "id": 4, "name": "God Emperor of Dune", "authorId": 1 },
+  { "id": 5, "name": "Heretics of Dune", "authorId": 1 },
+  { "id": 6, "name": "Chapterhouse: Dune", "authorId": 1 },
+  { "id": 7, "name": "The Three-Body Problem", "authorId": 2 },
+  { "id": 8, "name": "The Dark Forest", "authorId": 2 },
+  { "id": 8, "name": "Death's End", "authorId": 2 }
+]
